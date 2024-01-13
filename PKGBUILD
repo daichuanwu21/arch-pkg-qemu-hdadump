@@ -86,6 +86,7 @@ makedepends=(
   liburing
   libusb
   libx11
+  libxdp
   libxml2
   libxkbcommon
   lzo
@@ -167,6 +168,7 @@ _qemu_system_deps=(
   libseccomp libseccomp.so
   libslirp libslirp.so
   liburing liburing.so
+  libxdp libxdp.so
   lzo
   ndctl
   numactl libnuma.so
