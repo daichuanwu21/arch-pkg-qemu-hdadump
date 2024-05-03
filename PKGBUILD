@@ -1,4 +1,5 @@
-# Maintainer: David Runge <dvzrv@archlinux.org>
+# Maintainer: David Wu <daichuan@dwu21.net>
+# Contributor: David Runge <dvzrv@archlinux.org>
 # Contributor: Tobias Powalowski <tpowa@archlinux.org>
 # Contributor: Sébastien "Seblu" Luttringer <seblu@seblu.net>
 
@@ -129,6 +130,7 @@ source=(
   65-kvm.rules
   99-qemu-guest-agent.rules
   $pkgbase-8.1.1-static_regression.patch
+  $pkgbase-9.0.0-intel_hda_dma_capture.patch
 )
 sha512sums=('1603517cd4c93632ba60ad7261eb67374f12a744bf58f10b0e8686e46d3a02d8b6bf58a0c617f23a1868084aaba6386c24341894f75539e0b816091718721427'
             'SKIP'
@@ -137,7 +139,8 @@ sha512sums=('1603517cd4c93632ba60ad7261eb67374f12a744bf58f10b0e8686e46d3a02d8b6b
             '985c2c7a6b5217c87a15b45368089ee91b2f9027b070f9eafa448a18b27ae0d9edd964d52e134b9c1f4aeef4d6aae88afd3f454551ca898affef7f9d28b99b8f'
             'bdf05f99407491e27a03aaf845b7cc8acfa2e0e59968236f10ffc905e5e3d5e8569df496fd71c887da2b5b8d1902494520c7da2d3a8258f7fd93a881dd610c99'
             '93b905046fcea8a0a89513b9259c222494ab3b91319dde23baebcb40dc17376a56661b159b99785d6e816831974a0f3cbd7b2f7d89e5fc3c258f88f4492f3839'
-            'c7d086a951e9a378434ea95a843a4b01f0eb2ae430135a81365147cf6806a7ba1b49014a3aa66904970853ba84a4a28dbaded7bccb99a0bc3730572c80fb8b12')
+            'c7d086a951e9a378434ea95a843a4b01f0eb2ae430135a81365147cf6806a7ba1b49014a3aa66904970853ba84a4a28dbaded7bccb99a0bc3730572c80fb8b12'
+            '1e69e9b609a5f77db16ed3c0670c4380b83a83a2c3f6d3f39581b8d2561ab231f0a74ea39ad800dd52cd2356c0893ea15e03d67c32708f68cee8eaf296fc3e01')
 b2sums=('d92acb859d9ce5097fee27a4689c71869aa38f65eb0308547956d54bd8caf29efe5389d9009f334f109ad228e0ef1f1fd1444d26360f03fac4320b204b657081'
         'SKIP'
         'b1eca364aa60f130ff5e649f5d004d3fcb75356d3421a4542efdfc410d39b40d9434d15e1dd7bbdbd315cb72b5290d3ea5f77f9c41961a5601cd28ef7bbe72e8'
@@ -145,7 +148,8 @@ b2sums=('d92acb859d9ce5097fee27a4689c71869aa38f65eb0308547956d54bd8caf29efe5389d
         '69177b962d2fda20cafdbc6226fd017b5ca5a0f69f866d055dc1c744b7b2955059f47c693cfb5b4c863ec159569fdabd4327ab4b8a95566a68cd8ce38e339c7a'
         '3559fe9c4f744194939770047a0a02d07ff791c845a80726d0bc7b8c4801ed5f11150e7d5adab813844b3dab1cf38c3a5a87fb6efbb8fc9dccdda9fa56409ed8'
         'a9a2bdfeeb44eb86cbe88ac7c65f72800bdb2fd5cecb02f3a258cf9470b52832180aab43c89d481f7fd4d067342a9a27dd6c8a94d625b95d6e2b912e47d274e7'
-        '209ec05e161d157aaa08a9fcbea45cf87aa22fe9360f9b3c477a78a274e4ecee989c16121f9e6b7765bb479c9db718c98db047c27fd426c127c4c95e28877a16')
+        '209ec05e161d157aaa08a9fcbea45cf87aa22fe9360f9b3c477a78a274e4ecee989c16121f9e6b7765bb479c9db718c98db047c27fd426c127c4c95e28877a16'
+        'af101985c1269a7075fe3fd7cdd24df04ba8e43ae7e2e1b947c624e30069ea6ec18700ba7dc2bad1b5ed944e5cbe760d60c24e48168edb8b8efb211021f1fba9')
 validpgpkeys=('CEACC9E15534EBABB82D3FA03353C9CEF108B584') # Michael Roth <flukshun@gmail.com>
 
 _qemu_system_deps=(
@@ -276,6 +280,12 @@ _install_licenses() {
 prepare() {
   # fix crash with static binaries: https://gitlab.com/qemu-project/qemu/-/issues/1913
   patch -Np1 -d $pkgbase-$pkgver -i ../$pkgbase-8.1.1-static_regression.patch
+
+  # dump guest OS DMA interactions with audio hardware
+  # patches created by @jcs on GitHub: https://github.com/jcs/qemu/commits/jcs-hda-dma
+  # see #1: https://github.com/jcs/qemu/commit/7c1f83b6d700fc2733e0964a1a35383e71ecb838
+  # see #2: https://github.com/jcs/qemu/commit/0d2dd1d0e200f9b71c4fba2767522198630b6796
+  patch -Np1 -d $pkgbase-$pkgver -i ../$pkgbase-9.0.0-intel_hda_dma_capture.patch
 
   # extract licenses for TCG
   sed -n '1,23p' $pkgbase-$pkgver/tcg/tcg-internal.h > tcg.LICENSE.MIT.txt
