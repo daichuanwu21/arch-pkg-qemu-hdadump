@@ -1,5 +1,5 @@
 diff --git a/hw/vfio/helpers.c b/hw/vfio/helpers.c
-index 47b4096c05..bc1d817ffa 100644
+index 47b4096c05..cffc7bf614 100644
 --- a/hw/vfio/helpers.c
 +++ b/hw/vfio/helpers.c
 @@ -150,6 +150,13 @@ int vfio_set_irq_signaling(VFIODevice *vbasedev, int index, int subindex,
@@ -50,7 +50,7 @@ index 47b4096c05..bc1d817ffa 100644
 +            uint64_t dmaaddr = corbbase + (x * 4);
 +
 +            cpu_physical_memory_read(dmaaddr, buf, 4);
-+            corbs[x] = (uint32_t)ldl_p(buf);
++            corbs[x] = (uint32_t)ldl_le_p(buf); // assuming little-endian host! (e.g. x86_64)
 +
 +            printf("CORB[%ld] = 0x%" PRIx64 " (caddr:0x%lx nid:0x%lx "
 +                "control:0x%lx param:0x%lx)\n",
@@ -79,7 +79,7 @@ index 47b4096c05..bc1d817ffa 100644
 +            uint64_t dmaaddr = rirbbase + (x * 8);
 +
 +            cpu_physical_memory_read(dmaaddr, buf, 4);
-+            rirbs[x] = (uint32_t)ldl_p(buf);
++            rirbs[x] = (uint32_t)ldl_le_p(buf); // assuming little-endian host! (e.g. x86_64)
 +
 +            printf("CORB caddr:0x%lx nid:0x%lx control:0x%lx param:0x%lx "
 +                "response:0x%lx",
@@ -88,7 +88,7 @@ index 47b4096c05..bc1d817ffa 100644
 +                rirbs[x]);
 +
 +            cpu_physical_memory_read(dmaaddr + 4, buf, 4);
-+            printf(" (ex 0x%x)\n", (uint32_t)ldl_p(buf));
++            printf(" (ex 0x%x)\n", (uint32_t)ldl_le_p(buf)); // assuming little-endian host! (e.g. x86_64)
 +        }
 +        last_rirbwp = data;
 +    }
